@@ -1,6 +1,6 @@
 <?php
 include 'connection.php';
-
+// hatsus
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit();

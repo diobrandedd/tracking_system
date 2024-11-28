@@ -6,17 +6,11 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-if (isset($_GET['tracking_num'])) {
-    $tracking_num = urlencode($_GET['tracking_num']);
-    header("Location: update_package.php?tracking_num=$tracking_num");
-    exit();
-}
-
 // Fetch all packages
 $sql = "
     SELECT tracking_num, delivery_address, recipient_name, recipient_num, sender_name, 
            package_weight, current_location, estimated_delivery, delivery_status, updated_at
-    FROM packages WHERE record_status = 'A'";
+    FROM packages";
 $result = $conn->query($sql);
 ?>
 
@@ -30,6 +24,28 @@ $result = $conn->query($sql);
     <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modal styling */
+        #editModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #editModal .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg" style="background-color: #81cb71;">
@@ -40,11 +56,6 @@ $result = $conn->query($sql);
 
 <div class="container mt-5">
     <h2 class="mb-4">Manage Packages</h2>
-
-    <!-- Add Package Button -->
-    <div class="mb-3">
-        <a href="add_package.php" class="btn btn-primary"><i class="fas fa-plus"></i> Add Package</a>
-    </div>
 
     <!-- Package Table -->
     <div class="table-responsive">
@@ -78,8 +89,9 @@ $result = $conn->query($sql);
                         <td><?php echo htmlspecialchars($row['delivery_status']); ?></td>
                         <td><?php echo htmlspecialchars($row['updated_at']); ?></td>
                         <td>
-                            <a href="update_package.php?tracking_num=<?php echo urlencode($row['tracking_num']); ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                            <a href="delete_package.php?tracking_num=<?php echo urlencode($row['tracking_num']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this package?');"><i class="fas fa-trash"></i> Delete</a>
+                            <button class="btn btn-warning btn-sm" onclick="showEditModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -88,18 +100,69 @@ $result = $conn->query($sql);
     </div>
 </div>
 
+<!-- Edit Modal -->
+<div id="editModal">
+    <div class="modal-content">
+        <h4>Edit Package</h4>
+        <form id="editForm" method="POST" action="edit_package_action.php">
+            <input type="hidden" name="tracking_num" id="editTrackingNum">
+            <div class="mb-3">
+                <label for="editDeliveryAddress" class="form-label">Delivery Address:</label>
+                <input type="text" class="form-control" name="delivery_address" id="editDeliveryAddress" required>
+            </div>
+            <div class="mb-3">
+                <label for="editRecipientName" class="form-label">Recipient Name:</label>
+                <input type="text" class="form-control" name="recipient_name" id="editRecipientName" required>
+            </div>
+            <div class="mb-3">
+                <label for="editRecipientNum" class="form-label">Recipient Contact:</label>
+                <input type="text" class="form-control" name="recipient_num" id="editRecipientNum" required>
+            </div>
+            <div class="mb-3">
+                <label for="editCurrentLocation" class="form-label">Current Location:</label>
+                <input type="text" class="form-control" name="current_location" id="editCurrentLocation" required>
+            </div>
+            <div class="mb-3">
+                <label for="editDeliveryStatus" class="form-label">Delivery Status:</label>
+                <select class="form-select" name="delivery_status" id="editDeliveryStatus" required>
+                    <option value="In Transit">In Transit</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="editEstimatedDelivery" class="form-label">Estimated Delivery:</label>
+                <input type="date" class="form-control" name="estimated_delivery" id="editEstimatedDelivery" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="button" class="btn btn-secondary" onclick="hideEditModal()">Cancel</button>
+        </form>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('#packageTable').DataTable({
-            "paging": true,
-            "searching": true,
-            "ordering": true,
-            "info": true
-        });
+        $('#packageTable').DataTable();
     });
+
+    function showEditModal(packageData) {
+        document.getElementById('editTrackingNum').value = packageData.tracking_num;
+        document.getElementById('editDeliveryAddress').value = packageData.delivery_address;
+        document.getElementById('editRecipientName').value = packageData.recipient_name;
+        document.getElementById('editRecipientNum').value = packageData.recipient_num;
+        document.getElementById('editCurrentLocation').value = packageData.current_location;
+        document.getElementById('editDeliveryStatus').value = packageData.delivery_status;
+        document.getElementById('editEstimatedDelivery').value = packageData.estimated_delivery;
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function hideEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
 </script>
 </body>
 </html>

@@ -22,7 +22,7 @@ if (isset($_POST['login'])) {
 
 			header("Location:courier.php");
 
-		}else if($data['Password'] == $pass && $data['Position'] == 'Admin'){
+		}else if($data['Password'] == $pass && $data['Position'] == 'admin'){
 
 				header("Location:dashboard.php");
 		}else{

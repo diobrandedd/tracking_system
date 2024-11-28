@@ -6,11 +6,12 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-// Fetch all packages
 $sql = "
-    SELECT tracking_num, delivery_address, recipient_name, recipient_num, sender_name, 
-           package_weight, current_location, estimated_delivery, delivery_status, updated_at
-    FROM packages";
+    SELECT tracking_num, company_name, delivery_address, recipient_name, recipient_num, sender_name, 
+           package_weight, current_location, estimated_delivery, delivery_status, updated_at 
+    FROM packages 
+    WHERE record_status = 'A'";
+
 $result = $conn->query($sql);
 ?>
 
@@ -24,28 +25,6 @@ $result = $conn->query($sql);
     <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Modal styling */
-        #editModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        #editModal .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 500px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg" style="background-color: #81cb71;">
@@ -56,13 +35,12 @@ $result = $conn->query($sql);
 
 <div class="container mt-5">
     <h2 class="mb-4">Manage Packages</h2>
-
-    <!-- Package Table -->
     <div class="table-responsive">
         <table id="packageTable" class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Tracking Number</th>
+                    <th>Company Name</th>
                     <th>Delivery Address</th>
                     <th>Recipient Name</th>
                     <th>Recipient Contact</th>
@@ -79,6 +57,8 @@ $result = $conn->query($sql);
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['tracking_num']); ?></td>
+                        <td><?php echo htmlspecialchars($row['company_name']); ?></td>
+                        
                         <td><?php echo htmlspecialchars($row['delivery_address']); ?></td>
                         <td><?php echo htmlspecialchars($row['recipient_name']); ?></td>
                         <td><?php echo htmlspecialchars($row['recipient_num']); ?></td>
@@ -89,8 +69,13 @@ $result = $conn->query($sql);
                         <td><?php echo htmlspecialchars($row['delivery_status']); ?></td>
                         <td><?php echo htmlspecialchars($row['updated_at']); ?></td>
                         <td>
+                            <!-- Edit Button -->
                             <button class="btn btn-warning btn-sm" onclick="showEditModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
                                 <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <!-- Delete Button -->
+                            <button class="btn btn-danger btn-sm" onclick="showDeleteModal('<?php echo $row['tracking_num']; ?>')">
+                                <i class="fas fa-trash"></i> Delete
                             </button>
                         </td>
                     </tr>
@@ -101,8 +86,8 @@ $result = $conn->query($sql);
 </div>
 
 <!-- Edit Modal -->
-<div id="editModal">
-    <div class="modal-content">
+<div id="editModal" style="display: none; background: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center; z-index: 9999;">
+    <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; width: 400px;">
         <h4>Edit Package</h4>
         <form id="editForm" method="POST" action="edit_package_action.php">
             <input type="hidden" name="tracking_num" id="editTrackingNum">
@@ -140,6 +125,16 @@ $result = $conn->query($sql);
     </div>
 </div>
 
+<!-- Delete Modal -->
+<div id="deleteModal" style="display: none; background: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center; z-index: 9999;">
+    <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; width: 400px;">
+        <h4>Confirm Deletion</h4>
+        <p>Are you sure you want to mark this package as inactive?</p>
+        <button type="button" class="btn btn-secondary" onclick="hideDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
@@ -148,6 +143,7 @@ $result = $conn->query($sql);
         $('#packageTable').DataTable();
     });
 
+    // Edit Modal Logic
     function showEditModal(packageData) {
         document.getElementById('editTrackingNum').value = packageData.tracking_num;
         document.getElementById('editDeliveryAddress').value = packageData.delivery_address;
@@ -156,13 +152,46 @@ $result = $conn->query($sql);
         document.getElementById('editCurrentLocation').value = packageData.current_location;
         document.getElementById('editDeliveryStatus').value = packageData.delivery_status;
         document.getElementById('editEstimatedDelivery').value = packageData.estimated_delivery;
-
         document.getElementById('editModal').style.display = 'flex';
     }
 
     function hideEditModal() {
         document.getElementById('editModal').style.display = 'none';
     }
+
+    // Delete Modal Logic
+    let currentTrackingNum = "";
+
+    function showDeleteModal(trackingNum) {
+        currentTrackingNum = trackingNum;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function hideDeleteModal() {
+        currentTrackingNum = "";
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
+        if (currentTrackingNum) {
+            fetch("delete_package_action.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tracking_num: currentTrackingNum })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            hideDeleteModal();
+        }
+    });
 </script>
 </body>
 </html>

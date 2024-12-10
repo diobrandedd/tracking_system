@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css">
+    <title>IT Company || Home Page</title>
+  </head>
+  <body>
+    <style>
+    :root {
+  --primary-color:rgb(128, 70, 22);
+  --color-white: #fff;
+  --color-black: rgb(46, 38, 24);
+}
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+</style>
+    <header>
+      <div class="main-nav">
+        <a href="index.html" class="logo">LightCode.</a>
+        <ul>
+          <li><a href="index.html">HOME</a></li>
+          <li><a href="Menu.html">MENU</a></li>
+          <li><a href="about.html">ABOUT US</a></li>
+
+        </ul>
+      </div>
+      <div class="sub-nav">
+        <ul>
+          <li>
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="fab fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="fab fa-instagram-square"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </header>
+      <div class="sub-nav">
+      </div>
+    </header>
+    <div class="container">
+ 
+        <h1><center>Some of our works</center></h1>
+        <p><center>With every cup, with every conversation, with every community– we nurture the limitless possibilities of human connection.</center></p>
+      </div>
+      <br>
+      <hr>
+      <br>
+      <div class="work mb">
+        <img src="partners.jpg" alt="Work Image 1">
+        <img src="ourcoffee.jpg" alt="Work Image 2">
+        <img src="customers.jpg" alt="Work Image 3">
+        <img src="shop.jpg" alt="Work Image 4">
+        <img src="neighborhood.jpg" alt="Work Image 5">
+       
+ 
+      </div>
+    </div>
+    <center><h1>Our Mission</h1></center>
+    <p><center>The global Starbucks Mission Statement is more than words on a piece of paper - it's the philosophy that guides how we do business every day</center></p>
+    <br>
+    <br>
+    <h1><center>THE APEX STORY</center></h1>
+    <p><center>Back then, the company was a single store in Seattle's historic Pike Place Market. From just a narrow storefront, Starbucks offered some of the world's finest fresh-roasted whole bean coffees.
+         The name, inspired by Moby Dick, evoked the romance of the high seas and the seafaring tradition of the early coffee traders.
+        In 1981, Howard Schultz (Starbucks chairman and chief executive officer) had first walked into a Starbucks store. From his first cup of Sumatra, Howard was drawn into Starbucks and joined a year later.
+        In 1983, Howard traveled to Italy and became captivated with Italian coffee bars and the romance of the coffee experience. He had a vision to bring the Italian coffeehouse tradition back to the United States.
+         A place for conversation and a sense of community. A third place between work and home. He left Starbucks for a short period of time to start his own II Giornale coffeehouses and returned in August 1987 to purchase Starbucks with the help of local investors.
+        From the beginning, Starbucks set out to be a different kind of company. One that not only celebrated coffee and the rich tradition, but that also brought a feeling of connection.</center></p>
+ <hr>
+    <br>
+    <br>
+      </div>
+    </div>
+  </body>
+</html>

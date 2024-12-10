@@ -37,7 +37,7 @@ $pendingPackages = $resultPending->fetch_assoc()['pending'];
     <style>
         .sidebar {
             height: 100vh;
-            width: 250px;
+            width: 260px;
             position: fixed;
             background-color: #81cb71;
             padding-top: 20px;
@@ -45,25 +45,28 @@ $pendingPackages = $resultPending->fetch_assoc()['pending'];
         .sidebar a {
             text-decoration: none;
             color: white;
-            padding: 10px 15px;
+            padding: 15px 20px;
             display: block;
-            font-size: 16px;
+            font-size: 20px;
         }
         .sidebar a:hover {
             background-color: #6aa85e;
         }
         .sidebar a.active {
             background-color: #4d8742;
-            font-weight: bold;
         }
         .main-content {
             margin-left: 260px;
-            padding: 20px;
+            padding: 30px 40px;
+            padding-top: 50px;
         }
         .navbar-brand {
-            font-size: 24px;
+            font-size:40px;
             font-weight: bold;
             color: white;
+        }
+        .carousel-inner{
+            height: 600px;
         }
     </style>
 </head>
@@ -85,9 +88,10 @@ $pendingPackages = $resultPending->fetch_assoc()['pending'];
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
-    <div class="main-content">
-        <h1>Dashboard</h1>
-        <p>Welcome to the Power Puff Tracking System Dashboard.</p>
+    <div class="main-content" style="background-color: lightblue;">
+       
+        <h1 style="font-weight: bold; font-size: 45px; text-align: center;">Dashboard</h1>
+        <p style="font-size:20px; text-align: center;">Welcome to the Power Puff Tracking System Dashboard</p>
 
         <div class="row">
             <div class="col-md-4">
@@ -114,6 +118,33 @@ $pendingPackages = $resultPending->fetch_assoc()['pending'];
                     </div>
                 </div>
             </div>
+           <div id="carouselExampleIndicators" class="carousel slide">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="track.png" class="d-block w-100" alt="...">
+    </div>
+    <div class="carousel-item">
+      <img src="dhl.jpg" class="d-block w-100" alt="...">
+    </div>
+    <div class="carousel-item">
+      <img src="chingchong.jpg" class="d-block w-100" alt="...">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+
+        </div>
         </div>
     </div>
 

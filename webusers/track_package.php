@@ -31,16 +31,14 @@ if ($result->num_rows === 0) {
 $package = $result->fetch_assoc();
 
 // Query for tracking updates
-$sqlUpdates = "SELECT location_update FROM tracking_updates WHERE tracking_num = ?";
+$sqlUpdates = "
+    SELECT current_location_1, current_location_2, current_location_3, delivery_status, updated_at 
+    FROM tracking_updates 
+    WHERE tracking_num = ?";
 $stmtUpdates = $conn->prepare($sqlUpdates);
 $stmtUpdates->bind_param("s", $tracking_num);
 $stmtUpdates->execute();
-$resultUpdates = $stmtUpdates->get_result();
-
-$updates = [];
-while ($row = $resultUpdates->fetch_assoc()) {
-    $updates[] = $row['location_update'];
-}
+$updates = $stmtUpdates->get_result()->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,24 +68,35 @@ while ($row = $resultUpdates->fetch_assoc()) {
         .nav-link:hover {
             color: #ffd700;
         }
-        .tracking-box {
-            height: 150px;
-            width: 150px;
+        .progress-container {
             display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        .progress-box {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            font-size: 40px;
-            color: #28a745;
+            font-size: 16px;
+            background-color: #f8f9fa;
             border: 2px solid #28a745;
             border-radius: 10px;
-            margin: 10px;
+            padding: 15px;
         }
-        .tracking-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
+        .progress-box i {
+            font-size: 50px;
+            margin-bottom: 10px;
+            color: #28a745;
+        }
+        .progress-completed {
+            background-color: #28a745;
+            color: white;
         }
     </style>
 </head>
@@ -127,21 +136,35 @@ while ($row = $resultUpdates->fetch_assoc()) {
         </div>
     </div>
 
-    <!-- Tracking Updates -->
-    <div class="tracking-container">
-        <!-- First Box: Always shows the current delivery status -->
-        <div class="tracking-box">
-            <i class="fas fa-truck"></i><br>
-            <?php echo htmlspecialchars($package['delivery_status']); ?>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <!-- Box 1 -->
+        <div class="progress-box">
+            <i class="fas fa-box"></i>
+            <p><strong>Added</strong></p>
+            <p>Current Location: <?php echo htmlspecialchars($package['current_location']); ?></p>
         </div>
-        
-        <!-- Show updates only if there are records in the database -->
-        <?php foreach ($updates as $update): ?>
-            <div class="tracking-box">
-                <i class="fas fa-truck"></i><br>
-                <?php echo htmlspecialchars($update); ?>
-            </div>
-        <?php endforeach; ?>
+
+        <!-- Box 2 -->
+        <div class="progress-box <?php echo !empty($updates['current_location_1']) ? 'progress-completed' : ''; ?>">
+            <i class="fas fa-truck"></i>
+            <p><strong>In Transit</strong></p>
+            <p>Current Location: <?php echo htmlspecialchars($updates['current_location_1'] ?? 'Pending'); ?></p>
+        </div>
+
+        <!-- Box 3 -->
+        <div class="progress-box <?php echo !empty($updates['current_location_2']) ? 'progress-completed' : ''; ?>">
+            <i class="fas fa-truck"></i>
+            <p><strong>On Delivery</strong></p>
+            <p>Current Location: <?php echo htmlspecialchars($updates['current_location_2'] ?? 'Pending'); ?></p>
+        </div>
+
+        <!-- Box 4 -->
+        <div class="progress-box <?php echo $package['delivery_status'] === 'Delivered' ? 'progress-completed' : ''; ?>">
+            <i class="fas fa-home"></i>
+            <p><strong>Delivered</strong></p>
+            <p>Current Location: <?php echo htmlspecialchars($updates['current_location_3'] ?? 'Pending'); ?></p>
+        </div>
     </div>
 
     <a href="index.php" class="btn btn-secondary mt-3">Back to Home</a>

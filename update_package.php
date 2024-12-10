@@ -7,48 +7,94 @@ if (!isset($_SESSION['username'])) {
 }
 
 $username = $_SESSION['username'];
-
-// Ensure company_name is defined
-$company_name = isset($_SESSION['company_name']) ? $_SESSION['company_name'] : '';
+$company_name = isset($_SESSION['company_name']) ? $_SESSION['company_name'] : 'Unknown Company';
 
 // Check if tracking number is provided
-if (isset($_GET['tracking_num'])) {
-    $tracking_num = $_GET['tracking_num'];
-
-    // Fetch the package details using the tracking number
-    $sql = "SELECT * FROM packages WHERE tracking_num = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $tracking_num);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $package = $result->fetch_assoc();
-
-    if (!$package) {
-        echo "Package not found!";
-        exit();
-    }
-} else {
-    echo "No tracking number provided!";
-    exit();
+if (!isset($_GET['tracking_num'])) {
+    die("No tracking number provided.");
 }
 
-// Handle form submission for updating the package
+$tracking_num = $_GET['tracking_num'];
+
+// Fetch package details
+$sql = "SELECT * FROM packages WHERE tracking_num = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $tracking_num);
+$stmt->execute();
+$result = $stmt->get_result();
+$package = $result->fetch_assoc();
+
+if (!$package) {
+    die("<p>Package not found for tracking number: $tracking_num.</p>");
+}
+
+// Fetch tracking updates
+$sql = "SELECT * FROM tracking_updates WHERE tracking_num = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $tracking_num);
+$stmt->execute();
+$result = $stmt->get_result();
+$trackingUpdate = $result->fetch_assoc();
+
+if (!$trackingUpdate) {
+    die("<p>No tracking updates found for tracking number: $tracking_num.</p>");
+}
+
+// Handle the update request
 if (isset($_POST['update_package'])) {
     $current_location = $_POST['current_location'];
     $delivery_status = $_POST['delivery_status'];
     $estimated_delivery = $_POST['estimated_delivery'];
 
-    // Update the package details in the database
-    $sql = "UPDATE packages SET current_location = ?, delivery_status = ?, estimated_delivery = ?, updated_at = NOW() WHERE tracking_num = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssss", $current_location, $delivery_status, $estimated_delivery, $tracking_num);
-    $stmt->execute();
+    // Determine the appropriate column to update
+    if (!$trackingUpdate['current_location_1']) {
+        // First update
+        $sql = "UPDATE tracking_updates SET current_location_1 = ?, delivery_status = ?, updated_at = NOW() WHERE tracking_num = ?";
+    } elseif (!$trackingUpdate['current_location_2']) {
+        // Second update
+        $sql = "UPDATE tracking_updates SET current_location_2 = ?, delivery_status = ?, updated_at = NOW() WHERE tracking_num = ?";
+    } elseif ($delivery_status === "Delivered") {
+        if (!$trackingUpdate['current_location_2']) {
+            // Move current_location_1 to current_location_2 and store in current_location_3
+            $sql = "UPDATE tracking_updates 
+                    SET current_location_2 = current_location_1, current_location_3 = ?, delivery_status = ?, updated_at = NOW()
+                    WHERE tracking_num = ?";
+        } else {
+            // Update current_location_3 directly
+            $sql = "UPDATE tracking_updates SET current_location_3 = ?, delivery_status = ?, updated_at = NOW() WHERE tracking_num = ?";
+        }
+    }
 
-    echo "<script>alert('Package updated successfully!');</script>";
-    header("Location: courier2.php");
-    exit();
+    // Prepare the update statement
+    $stmt = $conn->prepare($sql);
+    if ($delivery_status === "Delivered" && !$trackingUpdate['current_location_2']) {
+        // Special case: Move current_location_1 to current_location_2
+        $stmt->bind_param("sss", $current_location, $delivery_status, $tracking_num);
+    } else {
+        // Standard case
+        $stmt->bind_param("sss", $current_location, $delivery_status, $tracking_num);
+    }
+
+    if ($stmt->execute()) {
+        // Update the packages table for current location and delivery status
+        $sql = "UPDATE packages SET current_location = ?, delivery_status = ?, estimated_delivery = ?, updated_at = NOW() WHERE tracking_num = ?";
+        $updateStmt = $conn->prepare($sql);
+        $updateStmt->bind_param("ssss", $current_location, $delivery_status, $estimated_delivery, $tracking_num);
+        $updateStmt->execute();
+        $updateStmt->close(); // Close the update statement
+
+        echo "<script>alert('Package updated successfully!');</script>";
+        header("Location: courier2.php");
+        exit();
+    } else {
+        echo "Error updating tracking: " . $stmt->error;
+    }
+
+    $stmt->close(); // Ensure the statement is closed
 }
 ?>
+
+
 <!DOCTYPE html>
 <html>
 <head>

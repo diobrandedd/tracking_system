@@ -25,16 +25,63 @@ $result = $conn->query($sql);
     <link href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+<style>
+         .sidebar {
+            height: 100vh;
+            width: 260px;
+            position: fixed;
+            background-color: #81cb71;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 15px 20px;
+            display: block;
+            font-size: 20px;
+        }
+        .sidebar a:hover {
+            background-color: #6aa85e;
+        }
+        .sidebar a.active {
+            background-color: #4d8742;
+           
+        }.main-content {
+            margin-left: 260px;
+            padding: 30px 40px;
+            padding-top: 50px;
+        }
+        .navbar-brand {
+            font-size:40px;
+            font-weight: bold;
+            color: white;
+        }
+        .container{
+    margin-right: 150px;          
+    margin-top: 190px !important;
+    padding: 50px;
+    border: 3px solid gray;
+    box-shadow:  0 0 10px;
+        }
+    </style>
 <nav class="navbar navbar-expand-lg" style="background-color: #81cb71;">
     <div class="container-fluid">
         <a class="navbar-brand text-white" href="dashboard.php">Power Puff Dashboard</a>
     </div>
 </nav>
-
-<div class="container mt-5">
-    <h2 class="mb-4">Deleted Packages</h2>
+    <div class="sidebar">
+        <a href="dashboard.php"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="manage_package.php"><i class="fas fa-box"></i> Manage Package</a>
+        <a href="package_history.php"><i class="fas fa-history"></i> Delivery History</a>
+        <a href="deleted_packages.php" class="active"><i class="fas fa-trash-alt"></i> Deleted Packages</a>
+        <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    <div class="main-content" style="background-color:skyblue; padding: 7px;">
+<div class="container mt-5"style="background-color: #B9E5E8;">
+    <h2 class="mb-4" style="font-weight: bold; font-size: 40px; text-align: center;" >Deleted Packages</h2>
     <div class="table-responsive">
     <table id="deletedPackagesTable" class="table table-bordered table-striped">
     <thead>
@@ -70,8 +117,9 @@ $result = $conn->query($sql);
         <?php endwhile; ?>
     </tbody>
 </table>
-
+</div>
     </div>
+    <br><br><br><br><br><br><br><br><br><br>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

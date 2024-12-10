@@ -1,141 +1,89 @@
-
-  *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:"poppins",sans-serif;
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
+
 body {
-    background-color: #646464;
-    background: linear-gradient(to right, #838282, #313131); /* Gradient background */
+    background: black;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items:  center;
 }
 
-.container {
-    margin: 0; 
-    padding: 0; 
-}
-form{
-    margin:0 2rem;
-}
-.form-title{
-    font-size:1.5rem;
-    font-weight:bold;
-    text-align:center;
-    padding:1.3rem;
-    margin-bottom:0.4rem;
-}
-input{
-    color:inherit;
-    width:100%;
-    background-color:transparent;
-    border:none;
-    border-bottom:1px solid #757575;
-    padding-left:1.5rem;
-    font-size:15px;
-}
-.input-group{
-    padding:1% 0;
-    position:relative;
 
-}
-.input-group i{
-    position:absolute;
-    color:black;
-}
-input:focus{
-    background-color: transparent;
-    outline:transparent;
-    border-bottom:2px solid hsl(327,90%,28%);
-}
-input::placeholder{
-    color:transparent;
-}
-label{
-    color:#757575;
-    position:relative;
-    left:1.2em;
-    top:-1.3em;
-    cursor:auto;
-    transition:0.3s ease all;
-}
-input:focus~label,input:not(:placeholder-shown)~label{
-    top:-3em;
-    color:hsl(327,90%,28%);
-    font-size:15px;
-}
-.recover{
-    text-align:right;
-    font-size:1rem;
-    margin-bottom:1rem;
-
-}
-.recover a{
-    text-decoration:none;
-    color:rgb(125,125,235);
-}
-.recover a:hover{
-    color:blue;
-    text-decoration:underline;
-}
-.btn{
-    font-size:1.1rem;
-    padding:8px 0;
-    border-radius:5px;
-    outline:none;
-    border:none;
-    width:100%;
-    background:rgb(31, 31, 31);
-    color:white;
-    cursor:pointer;
-    transition:0.9s;
-}
-.btn:hover{
-    background:rgb(67, 67, 67);;
-}
-
-.links{
-    display:flex;
-    justify-content:space-around;
-    padding:0 4rem;
-    margin-top:0.9rem;
-    font-weight:bold;
-}
-button{
-    color:rgb(34, 8, 120);
-    border:none;
-    background-color:transparent;
-    font-size:1rem;
-    font-weight:bold;
-}
-button:hover{
-    text-decoration:underline;
-    color:blue;
-}
-#signIn {
-    background-color: #fff; 
+.card {
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    border: 1px solid #ddd; 
-    border-radius: 10px; 
-    box-shadow:0 20px 35px rgba(0,0,1,0.9);
-    margin: 100px auto; 
+    background-color: #fff;
+    margin-top: 20px;
+  }
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    padding: 1.5rem;
 }
 
-#signIn input[type="text"], #signIn input[type="password"] {
-    padding: 10px;
+/* Form Inputs */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 100%;
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+    transition: border 0.3s ease;
 }
 
-#signIn input[type="submit"] {
-    padding: 10px 20px;
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+.btn {
+    background-color: #007bff;
     border: none;
-    border-radius: 5px;
-    background-color: #337ab7;
+    padding: 12px;
+    font-size: 1.1rem;
     color: #fff;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-#signIn input[type="submit"]:hover {
-    background-color: #23527c;
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.d-grid {
+    display: grid;
+    gap: 10px;
+}
+
+/* Hover Effects */
+input[type="text"]:hover, 
+input[type="password"]:hover,
+input[type="submit"]:hover {
+    border-color: #007bff;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+    .container {
+        padding: 0 1rem;
+    }
+    .card {
+        margin-top: 20px;
+        padding: 15px;
+    }
 }

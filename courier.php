@@ -15,26 +15,55 @@ $company_name = $_SESSION['company_name'];
 $default_record_status = "A";
 
 if (isset($_POST['add_package'])) {
-    $tracking_num = $_POST['tracking_num'];
-    $delivery_address = $_POST['delivery_address'];
-    $recipient_name = $_POST['recipient_name'];
-    $recipient_num = $_POST['recipient_num'];
-    $sender_name = $_POST['sender_name'];
-    $sender_email = $_POST['sender_email'];
-    $sender_num = $_POST['sender_num'];
-    $package_weight = $_POST['package_weight'];
-    $current_location = $_POST['current_location'];
-    $estimated_delivery = $_POST['estimated_delivery'];
+  $tracking_num = $_POST['tracking_num'];
+  $delivery_address = $_POST['delivery_address'];
+  $recipient_name = $_POST['recipient_name'];
+  $recipient_num = $_POST['recipient_num'];
+  $sender_name = $_POST['sender_name'];
+  $sender_email = $_POST['sender_email'];
+  $sender_num = $_POST['sender_num'];
+  $package_weight = $_POST['package_weight'];
+  $current_location = $_POST['current_location'];
+  $estimated_delivery = $_POST['estimated_delivery'];
 
-    $sql = "INSERT INTO packages 
-            (tracking_num, delivery_address, recipient_name, recipient_num, sender_name, sender_email, sender_num, package_weight, current_location, estimated_delivery, company_name, record_status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssssssss", $tracking_num, $delivery_address, $recipient_name, $recipient_num, $sender_name, $sender_email, $sender_num, $package_weight, $current_location, $estimated_delivery, $company_name, $default_record_status);
-    $stmt->execute();
-    echo "<script> alert('Package added successfully');</script>";
+  // Insert into packages table
+  $sql = "INSERT INTO packages 
+          (tracking_num, delivery_address, recipient_name, recipient_num, sender_name, sender_email, sender_num, package_weight, current_location, estimated_delivery, company_name, record_status) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  $stmt = $conn->prepare($sql);
 
+  if (!$stmt) {
+      die("Prepare failed (packages): " . $conn->error);
+  }
+
+  $stmt->bind_param("ssssssssssss", $tracking_num, $delivery_address, $recipient_name, $recipient_num, $sender_name, $sender_email, $sender_num, $package_weight, $current_location, $estimated_delivery, $company_name, $default_record_status);
+
+  if (!$stmt->execute()) {
+      die("Execution failed (packages): " . $stmt->error);
+  } else {
+      echo "<script> alert('Package added successfully');</script>";
+  }
+
+  // Insert into tracking_updates table
+  $sqls = "INSERT INTO tracking_updates (tracking_num, current_location_1, delivery_status) 
+           VALUES (?, ?, ?)";
+  $stmts = $conn->prepare($sqls);
+
+  if (!$stmts) {
+      die("Prepare failed (tracking_updates): " . $conn->error);
+  }
+
+  $delivery_status = "In Transit"; // Default status for new packages
+  $stmts->bind_param("sss", $tracking_num, $current_location, $delivery_status);
+
+  if (!$stmts->execute()) {
+      die("Execution failed (tracking_updates): " . $stmts->error);
+  } else {
+      echo "<script> alert('Tracking update added successfully');</script>";
+  }
 }
+
+
 
 ?>
 <!DOCTYPE html>
